@@ -1,8 +1,11 @@
 <?php
 namespace App\Controller\Component;
 
+use App\Util\ResourceLoader;
+
 use Cake\Controller\Component;
-use Cake\Controller\ComponentRegistry;
+
+use Exception;
 
 /**
  * Mapper component
@@ -15,7 +18,6 @@ use Cake\Controller\ComponentRegistry;
  */
 class MapperComponent extends Component
 {
-
     /**
      * Default configuration.
      *
@@ -26,30 +28,25 @@ class MapperComponent extends Component
         'fieldKey' => 'search-term',
     ];
     
+    /**
+     * Search for the desired data field on the RESTful resource specified.
+     *
+     * @return type
+     * @throws Exception
+     */
     public function search()
     {
-        $resource = $this->getConfig('resourceUrl');
+        //  acquire the supplied data field or throw an exception
         $field = $this->getConfig('fieldKey');
-        
         $userData = $this->request->getData();
         if (!isset($userData[$field])) {
-            throw new \Exception('Missing field');
+            throw new Exception('Missing field');
         }
-
-        $searchTerm = $userData['search-term'];
-        $results = file_get_contents($resource . urlencode($searchTerm));
-        if ($results === false) {
-
-        }
-
-        $data = json_decode($results);
-        if ($data === false) {
-
-        }
-
-        if (!isset($data->results) || !isset($data->term)) {
-
-        }
+        
+        //  retrieve the response from the restful server
+        $resource = $this->getConfig('resourceUrl');
+        $resourceLoader = new ResourceLoader($resource);
+        $data = $resourceLoader->search($userData[$field]);
         
         return [
             'term' => $data->term,
