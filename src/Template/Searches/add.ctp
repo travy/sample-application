@@ -4,7 +4,7 @@
             <form action="/searches/add" method="post">
                 <div class="">
                     <label for="search-term"><?= __('Enter a value:') ?></label>
-                    <input id="search-term" name="search-term" type="text" required>
+                    <input id="search-term" maxlength="100" name="search-term" type="text" required>
                 </div>
                 
                 <input type="submit">

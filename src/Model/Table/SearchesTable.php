@@ -45,6 +45,7 @@ class SearchesTable extends Table
         $validator
             ->scalar('term')
             ->requirePresence('term', 'create')
+            ->maxLength('term', 100)
             ->notEmpty('term');
 
         $validator
