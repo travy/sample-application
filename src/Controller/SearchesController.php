@@ -13,6 +13,17 @@ use App\Controller\AppController;
 class SearchesController extends AppController
 {
     /**
+     * Attaches the Mapper Component which will allow for conversion of RESTful
+     * data to the database model entity.
+     *
+     */
+    public function initialize() {
+        parent::initialize();
+        
+        $this->loadComponent('Mapper');
+    }
+    
+    /**
      * Index method
      *
      * @return \Cake\Http\Response|void
@@ -55,31 +66,7 @@ class SearchesController extends AppController
     public function add()
     {
         if ($this->request->is('post')) {
-            $userData = $this->request->getData();
-            if (!isset($userData['search-term'])) {
-                $this->Flash->error(__('Please specify a valid search term.'));
-            }
-            
-            $searchTerm = $userData['search-term'];
-            $results = file_get_contents('http://echo.jsontest.com/results/10/term/' . urlencode($searchTerm));
-            if ($results === false) {
-                
-            }
-            
-            $data = json_decode($results);
-            if ($data === false) {
-                
-            }
-            
-            if (!isset($data->results) || !isset($data->term)) {
-                
-            }
-            
-            $entityData = [
-                'term' => $data->term,
-                'results' => $data->results,
-            ];
-            
+            $entityData = $this->Mapper->search();
             $search = $this->Searches->newEntity($entityData);
             if ($this->Searches->save($search)) {
                 $this->Flash->success(__('The searches entry has been saved'));
