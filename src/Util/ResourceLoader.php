@@ -1,7 +1,10 @@
 <?php
 namespace App\Util;
 
-use Exception;
+use InvalidArgumentException;
+
+use App\Exceptions\ResourceConnectionFailedException;
+use App\Exceptions\JsonConversionException;
 
 /**
  * Description of ResourceLoader
@@ -22,7 +25,7 @@ class ResourceLoader
     public function __construct($resource)
     {
         if (!filter_var($resource, FILTER_VALIDATE_URL)) {
-            throw new Exception('An invalid URL was supplied');
+            throw new InvalidArgumentException('An invalid URL was supplied');
         }
         
         $this->resource = $resource;
@@ -41,13 +44,13 @@ class ResourceLoader
         $requestUrl = $this->resource . urlencode($value);
         $results = file_get_contents($requestUrl);
         if ($results === false) {
-            throw new Exception('Was unable to connecto the the resource at:  ' . $requestUrl);
+            throw new ResourceConnectionFailedException('Was unable to connecto the the resource at:  ' . $requestUrl);
         }
         
         //  convert the acquired data to a json object
         $json = json_decode($results);
         if (is_null($json)) {
-            throw new Exception('The acquired results could not be converted to a valid JSON object');
+            throw new JsonConversionException('The acquired results could not be converted to a valid JSON object');
         }
         
         return $json;

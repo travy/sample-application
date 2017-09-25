@@ -2,6 +2,9 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
+use App\Exceptions\ResourceConnectionFailedException;
+use App\Exceptions\JsonConversionException;
+use InvalidArgumentException;
 
 /**
  * Searches Controller
@@ -66,12 +69,22 @@ class SearchesController extends AppController
     public function add()
     {
         if ($this->request->is('post')) {
-            $entityData = $this->Mapper->search();
-            $search = $this->Searches->newEntity($entityData);
-            if ($this->Searches->save($search)) {
-                $this->Flash->success(__('The searches entry has been saved'));
-                
-                return $this->redirect(['action' => 'index']);
+            try {
+                //  attempts to map execute the restful service and save the data
+                $entityData = $this->Mapper->search();
+                $search = $this->Searches->newEntity($entityData);
+                if ($this->Searches->save($search)) {
+                    $this->Flash->success(__('The searches entry has been saved'));
+
+                    return $this->redirect(['action' => 'index']);
+                }
+            //  checks for all errors which could occur and handles them by throwing a Flash message
+            } catch(ResourceConnectionFailedException $resourceFailed) {
+                $this->Flash->error(__('The configured HTTP resource was invalid'));
+            } catch(JsonConversionException $jsonFailed) {
+                $this->Flash->error(__('Was unable to successfully convert the RESTful response to a JSON object'));
+            } catch (InvalidArgumentException $argument) {
+                $this->Flash->error(__('The supplied RESTful service was not a valid URL'));
             }
         }
         

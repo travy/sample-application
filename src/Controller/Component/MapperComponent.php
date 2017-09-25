@@ -4,6 +4,7 @@ namespace App\Controller\Component;
 use App\Util\ResourceLoader;
 
 use Cake\Controller\Component;
+use Cake\Network\Exception\BadRequestException;
 
 use Exception;
 
@@ -40,7 +41,7 @@ class MapperComponent extends Component
         $field = $this->getConfig('fieldKey');
         $userData = $this->request->getData();
         if (!isset($userData[$field])) {
-            throw new Exception('Missing field');
+            throw new BadRequestException('Missing data field');
         }
         
         //  retrieve the response from the restful server
