@@ -20,7 +20,9 @@ class SearchesController extends AppController
      */
     public function index()
     {
-        $searches = $this->paginate($this->Searches);
+        $searches = $this->paginate($this->Searches, [
+            'limit' => 5,
+        ]);
 
         $this->set(compact('searches'));
         $this->set('_serialize', ['searches']);
