@@ -12,7 +12,6 @@ use App\Controller\AppController;
  */
 class SearchesController extends AppController
 {
-
     /**
      * Index method
      *
@@ -22,6 +21,9 @@ class SearchesController extends AppController
     {
         $searches = $this->paginate($this->Searches, [
             'limit' => 5,
+            'order' => [
+                'created' => 'desc',
+            ],
         ]);
 
         $this->set(compact('searches'));
@@ -52,16 +54,40 @@ class SearchesController extends AppController
      */
     public function add()
     {
-        $search = $this->Searches->newEntity();
         if ($this->request->is('post')) {
-            $search = $this->Searches->patchEntity($search, $this->request->getData());
+            $userData = $this->request->getData();
+            if (!isset($userData['search-term'])) {
+                $this->Flash->error(__('Please specify a valid search term.'));
+            }
+            
+            $searchTerm = $userData['search-term'];
+            $results = file_get_contents('http://echo.jsontest.com/results/10/term/' . urlencode($searchTerm));
+            if ($results === false) {
+                
+            }
+            
+            $data = json_decode($results);
+            if ($data === false) {
+                
+            }
+            
+            if (!isset($data->results) || !isset($data->term)) {
+                
+            }
+            
+            $entityData = [
+                'term' => $data->term,
+                'results' => $data->results,
+            ];
+            
+            $search = $this->Searches->newEntity($entityData);
             if ($this->Searches->save($search)) {
-                $this->Flash->success(__('The search has been saved.'));
-
+                $this->Flash->success(__('The searches entry has been saved'));
+                
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The search could not be saved. Please, try again.'));
         }
+        
         $this->set(compact('search'));
         $this->set('_serialize', ['search']);
     }

@@ -1,23 +1,14 @@
-<?php
-/**
- * @var \App\View\AppView $this
- */
-?>
-<nav class="large-3 medium-4 columns" id="actions-sidebar">
-    <ul class="side-nav">
-        <li class="heading"><?= __('Actions') ?></li>
-        <li><?= $this->Html->link(__('List Searches'), ['action' => 'index']) ?></li>
-    </ul>
-</nav>
-<div class="searches form large-9 medium-8 columns content">
-    <?= $this->Form->create($search) ?>
-    <fieldset>
-        <legend><?= __('Add Search') ?></legend>
-        <?php
-            echo $this->Form->control('term');
-            echo $this->Form->control('results');
-        ?>
-    </fieldset>
-    <?= $this->Form->button(__('Submit')) ?>
-    <?= $this->Form->end() ?>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xs-12">
+            <form action="/searches/add" method="post">
+                <div class="">
+                    <label for="search-term"><?= __('Enter a value:') ?></label>
+                    <input id="search-term" name="search-term" type="text" required>
+                </div>
+                
+                <input type="submit">
+            </form>
+        </div>
+    </div>
 </div>
